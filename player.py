@@ -9,6 +9,8 @@ class Player(CircleShape):
         self.rotation = 0
         self.x = x
         self.y = y
+        self.shot_counter = 0
+
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
@@ -20,7 +22,7 @@ class Player(CircleShape):
     def draw(self, screen):
         pygame.draw.polygon(screen, "white", self.triangle(), 2)
     
-    def update(self, dt):
+    def update(self, dt):    
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
@@ -33,7 +35,12 @@ class Player(CircleShape):
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
-    
+        
+        if self.shot_counter > 0:
+            self.shot_counter -= dt
+        if self.shot_counter < 0:
+            self.shot_counter = 0
+
     def rotate(self, dt):
         self.rotation += TURN_SPEED * dt
     
@@ -42,10 +49,12 @@ class Player(CircleShape):
         self.position += forward * PLAYER_SPEED * dt
     
     def shoot(self):
-        # Calculate the tip position
-        forward = pygame.Vector2(0, 1.33).rotate(self.rotation)
-        tip_position = self.position + forward * self.radius
-        
-        # Create the shot at the tip position
-        shot = Shot(tip_position.x, tip_position.y)
-        shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+            if self.shot_counter == 0:
+                # Calculate the tip position
+                forward = pygame.Vector2(0, 1.33).rotate(self.rotation)
+                tip_position = self.position + forward * self.radius
+
+                # Create the shot at the tip position
+                shot = Shot(tip_position.x, tip_position.y)
+                shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+                self.shot_counter = PLAYER_SHOOT_COOLDOWN
