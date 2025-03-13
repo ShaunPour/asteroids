@@ -35,6 +35,10 @@ def main():
             if player.collides_with(asteroid):  # Make sure method name matches
                 print("Game over!")
                 sys.exit()  # This completely exits the program
+            for shot in shots:
+                if shot.collides_with(asteroid):
+                    shot.kill()
+                    asteroid.kill()
         for drawing in drawable:
             drawing.draw(screen)
         pygame.display.flip()
